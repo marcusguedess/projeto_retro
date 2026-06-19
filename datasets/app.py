@@ -72,8 +72,20 @@ st.write("---")
 
 # Carregando os dados
 BASE_DIR = Path(__file__).resolve().parent
-df_books = pd.read_csv(BASE_DIR / "Top-100 Trending Books.csv")
-df_reviews = pd.read_csv(BASE_DIR / "customer reviews.csv")
+BOOKS_DATA = BASE_DIR / "Top-100 Trending Books.csv"
+REVIEWS_DATA = BASE_DIR / "customer reviews.csv"
+SAMPLE_BOOKS_DATA = BASE_DIR / "sample_books.csv"
+SAMPLE_REVIEWS_DATA = BASE_DIR / "sample_reviews.csv"
+
+using_sample_data = not BOOKS_DATA.exists() or not REVIEWS_DATA.exists()
+df_books = pd.read_csv(BOOKS_DATA if BOOKS_DATA.exists() else SAMPLE_BOOKS_DATA)
+df_reviews = pd.read_csv(REVIEWS_DATA if REVIEWS_DATA.exists() else SAMPLE_REVIEWS_DATA)
+
+if using_sample_data:
+    st.info(
+        "Rodando com dados de exemplo anonimizados. Para usar a base completa local, "
+        "adicione os CSVs brutos na pasta datasets/."
+    )
 
 # Menu lateral
 st.sidebar.markdown("### PAINEL DE CONTROLE CYBERDECK")

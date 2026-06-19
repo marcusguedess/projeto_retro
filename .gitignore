@@ -13,6 +13,8 @@ streamlit.out.log
 streamlit.err.log
 
 datasets/*.csv
+!datasets/sample_books.csv
+!datasets/sample_reviews.csv
 
 .streamlit/secrets.toml
 .DS_Store

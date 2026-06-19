@@ -9,6 +9,8 @@ Arquivos esperados pelo app:
 
 Motivo: a base de reviews pode conter nomes de revisores, textos longos com informacoes pessoais e conteudo sujeito a termos de uso da fonte original. Para publicar o projeto, mantenha os CSVs fora do repositorio ou substitua por uma amostra anonimizada.
 
+O repositorio inclui os arquivos `sample_books.csv` e `sample_reviews.csv` para que outras pessoas consigam clonar e testar o app sem acessar os dados brutos.
+
 ## Colunas esperadas
 
 `Top-100 Trending Books.csv`:

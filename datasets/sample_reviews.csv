@@ -1,0 +1,6 @@
+Sno,book name,review title,reviewer,reviewer rating,review description,is_verified,date,timestamp,ASIN
+1,Neon Pages,Great cyberpunk atmosphere,Anonymous Reviewer 1,5,Fun read with a strong retrofuturistic tone.,TRUE,01-01-2026,Reviewed in the United States January 1 2026,SAMPLE001
+2,Neon Pages,Stylish and quick,Anonymous Reviewer 2,4,The concept is engaging and the pacing is light.,TRUE,02-01-2026,Reviewed in the United States January 2 2026,SAMPLE001
+3,Midnight Library Logs,Interesting mystery,Anonymous Reviewer 3,4,A compact story with good mood and clean writing.,FALSE,03-01-2026,Reviewed in the United States January 3 2026,SAMPLE002
+4,Code and Coffee,Useful and clear,Anonymous Reviewer 4,5,Good examples and practical explanations.,TRUE,04-01-2026,Reviewed in the United States January 4 2026,SAMPLE003
+5,Retro Future Notes,Strong visual references,Anonymous Reviewer 5,4,The design discussion is concise and memorable.,TRUE,05-01-2026,Reviewed in the United States January 5 2026,SAMPLE004

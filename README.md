@@ -4,7 +4,7 @@ Projeto desenvolvido **for fun** para explorar dados de livros e reviews da Amaz
 
 A ideia do projeto é evoluir para um revisor/analista de reviews de livros com dados atualizados em tempo real. Por enquanto, esta primeira versão de testes trabalha com bases locais em CSV e serve como protótipo inicial da experiência, dos filtros e das visualizações.
 
-Por segurança e privacidade, os CSVs brutos não são versionados por padrão. A base de reviews pode conter nomes de revisores, textos com informações pessoais e conteúdo sujeito aos termos de uso da fonte original.
+Por segurança e privacidade, os CSVs brutos não são versionados por padrão. A base de reviews pode conter nomes de revisores, textos com informações pessoais e conteúdo sujeito aos termos de uso da fonte original. Para manter o projeto testável no GitHub, o repositório inclui amostras anonimizadas.
 
 ## Status
 
@@ -41,6 +41,8 @@ A interface foi criada com uma estética retrofuturista, usando cores neon, fund
 .
 ├── datasets/
 │   ├── app.py
+│   ├── sample_books.csv
+│   ├── sample_reviews.csv
 │   └── README.md
 ├── .gitignore
 ├── requirements.txt
@@ -49,7 +51,9 @@ A interface foi criada com uma estética retrofuturista, usando cores neon, fund
 
 ## Como rodar localmente
 
-Antes de executar, coloque os arquivos CSV locais dentro da pasta `datasets/`:
+O projeto já inclui dados de exemplo anonimizados, então pode ser executado logo após a instalação.
+
+Para usar a base completa local, coloque os arquivos CSV brutos dentro da pasta `datasets/`:
 
 - `Top-100 Trending Books.csv`
 - `customer reviews.csv`
@@ -71,6 +75,7 @@ streamlit run datasets/app.py
 - Não há chaves de API, tokens ou credenciais no código.
 - Arquivos `.env`, logs, cache Python e `secrets.toml` estão ignorados no Git.
 - Os CSVs brutos estão ignorados para evitar publicar dados de terceiros ou conteúdo pessoal de reviews.
+- Amostras anonimizadas foram incluídas para permitir testes públicos do projeto.
 - A busca por título é tratada como texto literal, não como expressão regular.
 - O HTML permitido via `unsafe_allow_html=True` é usado apenas com conteúdo estático do próprio app.
 
