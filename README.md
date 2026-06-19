@@ -1,5 +1,7 @@
 # Cyberdeck Retro - Revisor de Reviews de Livros
 
+![Banner pixel art neon do Cyberdeck Retro](assets/readme-banner.svg)
+
 Projeto desenvolvido **for fun** para explorar dados de livros e reviews em um painel visual inspirado em cyberdecks, arcade retrofuturista e Night City.
 
 A ideia original era evoluir para um revisor/analista de reviews de livros com dados atualizados em tempo real. Como a prioridade atual é manter o projeto gratuito, seguro e sem gasto com tokens ou APIs pagas, esta versão trabalha com CSVs locais, upload manual de dados e amostras públicas anonimizadas.
@@ -19,13 +21,16 @@ A versão atual inclui UI revisada, upload de CSV, dados de exemplo, score local
 - Filtros por gênero, título, preço máximo e nota mínima.
 - Filtro de reviews verificadas.
 - Filtro de reviews que merecem revisão manual.
+- Busca textual literal em reviews, títulos e nomes de livros.
 - Score local de confiança das reviews.
+- Explicação dos motivos que impactaram o score de cada review.
 - Radar de compra com destaques automáticos.
 - Comparador de até 4 livros.
+- Aba de qualidade dos dados com origem, colunas, vazios e duplicatas.
 - Gráficos interativos com Plotly.
 - Exportação de CSVs filtrados.
 - Proteção simples contra CSV formula injection nos arquivos exportados.
-- Interface cyberpunk com foco em leitura rápida e navegação fácil.
+- Interface em pixel art neon com foco em leitura rápida e navegação fácil.
 
 ## Score de confiança
 
@@ -40,6 +45,8 @@ Ele reduz pontos quando uma review apresenta sinais como:
 - pontuação repetida em excesso.
 
 O score não é uma detecção definitiva de fraude. Ele serve para priorizar revisão humana.
+
+Cada review exibe também os motivos do alerta, como `não verificada`, `texto curto`, `título genérico` ou `nota extrema sem verificação`.
 
 ## Radar de compra
 
@@ -56,7 +63,7 @@ Esses destaques usam preço, nota, volume de reviews, percentual de reviews veri
 
 Cyberpunk sempre. Hahaha.
 
-A interface foi criada para parecer um cyberdeck: fundo escuro, luzes neon, contraste alto, botões coloridos, chips de status, painéis de métricas e uma sensação arcade. A intenção é que a pessoa entenda rapidamente os filtros e gráficos, mas ainda sinta que está navegando em um painel saído de Night City.
+A interface foi criada para parecer um painel arcade de ficção urbana: fundo escuro, luzes neon, contraste alto, botões coloridos, chips de status, painéis de métricas e um banner em pixel art com skyline, sol neon e grade retrofuturista. A intenção é que a pessoa entenda rapidamente os filtros e gráficos, mas ainda sinta que está entrando em um console visual memorável.
 
 O design prioriza:
 
@@ -65,7 +72,7 @@ O design prioriza:
 - métricas visíveis logo no topo;
 - gráficos com cores fortes;
 - ações diretas para upload, comparação e download;
-- visual cyberpunk sem tornar a interface confusa.
+- visual expressivo sem tornar a interface confusa.
 
 ## Tecnologias
 
@@ -80,6 +87,8 @@ O design prioriza:
 .
 ├── .streamlit/
 │   └── config.toml
+├── assets/
+│   └── readme-banner.svg
 ├── datasets/
 │   ├── app.py
 │   ├── cyberdeck/
@@ -115,6 +124,7 @@ Depois de abrir o app, você pode:
 
 - usar os dados de exemplo;
 - enviar seus próprios CSVs pela barra lateral;
+- buscar termos específicos dentro das reviews;
 - comparar livros;
 - baixar os resultados filtrados;
 - trocar filtros sem depender de qualquer API externa.
@@ -156,6 +166,7 @@ Não é necessário cadastrar secrets para a versão pública com samples.
 - Amostras anonimizadas permitem testes públicos sem expor dados reais.
 - Uploads são limitados a 50 MB pela configuração do Streamlit.
 - A busca por título é tratada como texto literal, não como expressão regular.
+- A busca nas reviews também é literal, evitando execução de padrões regex fornecidos pelo usuário.
 - O HTML permitido via `unsafe_allow_html=True` é usado apenas com conteúdo estático ou valores controlados pelo app.
 - Exportações CSV neutralizam células iniciadas por `=`, `+`, `-` ou `@`.
 

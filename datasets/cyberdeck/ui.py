@@ -53,36 +53,58 @@ h2, h3 {
 .hero {
     position: relative;
     overflow: hidden;
+    min-height: 260px;
     padding: 28px;
     border: 1px solid rgba(34, 211, 238, 0.38);
     background:
-        linear-gradient(135deg, rgba(34, 211, 238, 0.14), rgba(139, 92, 246, 0.16)),
+        linear-gradient(180deg, rgba(8, 10, 34, 0.96), rgba(5, 3, 18, 0.98) 48%, rgba(7, 3, 12, 1)),
         rgba(3, 7, 18, 0.90);
-    box-shadow: 0 0 38px rgba(34, 211, 238, 0.14);
+    box-shadow: 0 0 42px rgba(34, 211, 238, 0.16), inset 0 0 80px rgba(236, 72, 153, 0.08);
 }
 
 .hero:before {
     content: "";
     position: absolute;
     inset: 0;
-    background-image:
+    background:
         linear-gradient(rgba(34, 211, 238, 0.08) 1px, transparent 1px),
         linear-gradient(90deg, rgba(34, 211, 238, 0.06) 1px, transparent 1px);
-    background-size: 30px 30px;
-    mask-image: linear-gradient(90deg, rgba(0,0,0,0.74), transparent);
+    background-size: 32px 32px;
+    mask-image: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.75) 48%, rgba(0,0,0,0.95) 100%);
     pointer-events: none;
 }
 
-.hero-title {
+.hero:after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        180deg,
+        rgba(255,255,255,0.035) 0,
+        rgba(255,255,255,0.035) 1px,
+        transparent 1px,
+        transparent 5px
+    );
+    pointer-events: none;
+    mix-blend-mode: screen;
+}
+
+.hero-content {
     position: relative;
+    z-index: 2;
+    max-width: 760px;
+}
+
+.hero-title {
     margin: 0;
-    font-size: 2.45rem;
+    max-width: 720px;
+    font-size: 2.7rem;
     line-height: 1.08;
     font-weight: 800;
+    text-shadow: 0 0 18px rgba(34, 211, 238, 0.46), 0 0 34px rgba(244, 114, 182, 0.22);
 }
 
 .hero-subtitle {
-    position: relative;
     max-width: 920px;
     margin: 12px 0 0;
     color: #C9D7EA;
@@ -90,7 +112,6 @@ h2, h3 {
 }
 
 .chip-row {
-    position: relative;
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
@@ -107,7 +128,96 @@ h2, h3 {
     font-family: 'JetBrains Mono', monospace;
 }
 
-.metric-grid, .radar-grid {
+.pixel-scene {
+    position: absolute;
+    right: 24px;
+    bottom: 0;
+    width: min(42vw, 520px);
+    height: 230px;
+    z-index: 1;
+}
+
+.pixel-sun {
+    position: absolute;
+    right: 110px;
+    top: 12px;
+    width: 150px;
+    height: 150px;
+    background:
+        repeating-linear-gradient(
+            180deg,
+            #FDE047 0 12px,
+            #FB7185 12px 22px,
+            transparent 22px 30px
+        );
+    clip-path: polygon(8% 22%, 18% 8%, 50% 0%, 82% 8%, 92% 22%, 100% 50%, 92% 78%, 82% 92%, 50% 100%, 18% 92%, 8% 78%, 0% 50%);
+    filter: drop-shadow(0 0 28px rgba(251, 113, 133, 0.72));
+    opacity: 0.92;
+}
+
+.pixel-moon {
+    position: absolute;
+    right: 36px;
+    top: 28px;
+    width: 10px;
+    height: 10px;
+    background: #A7F3FF;
+    box-shadow:
+        22px 20px #A7F3FF,
+        -26px 34px #E879F9,
+        42px 58px #67E8F9,
+        -58px 78px #A78BFA;
+}
+
+.skyline {
+    position: absolute;
+    right: 0;
+    bottom: 24px;
+    display: flex;
+    align-items: end;
+    gap: 8px;
+}
+
+.tower {
+    width: 42px;
+    background: linear-gradient(180deg, #111827, #020617);
+    border: 1px solid rgba(34, 211, 238, 0.34);
+    box-shadow: inset 0 0 18px rgba(34, 211, 238, 0.08), 0 0 18px rgba(139, 92, 246, 0.16);
+}
+
+.tower:before {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    background:
+        repeating-linear-gradient(180deg, transparent 0 12px, rgba(34, 211, 238, 0.55) 12px 15px),
+        repeating-linear-gradient(90deg, transparent 0 12px, rgba(244, 114, 182, 0.45) 12px 15px);
+    opacity: 0.72;
+}
+
+.t1 { height: 88px; }
+.t2 { height: 138px; }
+.t3 { height: 112px; }
+.t4 { height: 164px; }
+.t5 { height: 96px; }
+.t6 { height: 126px; }
+
+.pixel-road {
+    position: absolute;
+    right: -30px;
+    bottom: -42px;
+    width: 520px;
+    height: 118px;
+    background:
+        linear-gradient(90deg, transparent 0 46%, rgba(34, 211, 238, 0.72) 46% 47%, transparent 47% 53%, rgba(244, 114, 182, 0.72) 53% 54%, transparent 54%),
+        repeating-linear-gradient(90deg, rgba(34, 211, 238, 0.0) 0 35px, rgba(34, 211, 238, 0.20) 35px 37px),
+        linear-gradient(180deg, rgba(15, 23, 42, 0), rgba(15, 23, 42, 0.95));
+    transform: perspective(260px) rotateX(58deg);
+    transform-origin: bottom;
+}
+
+.metric-grid {
     display: grid;
     gap: 12px;
 }
@@ -117,11 +227,6 @@ h2, h3 {
     margin: 18px 0 10px;
 }
 
-.radar-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    margin: 12px 0 18px;
-}
-
 .metric-card {
     border: 1px solid rgba(34, 211, 238, 0.26);
     background: rgba(7, 10, 24, 0.82);
@@ -129,7 +234,7 @@ h2, h3 {
     box-shadow: inset 0 0 24px rgba(139, 92, 246, 0.08);
 }
 
-.metric-label, .section-title {
+.metric-label {
     font-family: 'JetBrains Mono', monospace;
 }
 
@@ -151,12 +256,6 @@ h2, h3 {
     background: rgba(8, 15, 34, 0.88);
     padding: 12px 14px;
     color: #DDEBFF;
-}
-
-.section-title {
-    margin-top: 20px;
-    color: #67E8F9;
-    font-weight: 700;
 }
 
 div[data-testid="stDataFrame"], div[data-testid="stTable"] {
@@ -187,17 +286,22 @@ footer, #MainMenu {
 }
 
 @media (max-width: 1100px) {
-    .radar-grid, .metric-grid {
+    .metric-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
 @media (max-width: 620px) {
-    .radar-grid, .metric-grid {
+    .metric-grid {
         grid-template-columns: 1fr;
     }
     .hero-title {
         font-size: 1.75rem;
+    }
+    .pixel-scene {
+        opacity: 0.34;
+        right: -90px;
+        width: 420px;
     }
 }
 </style>
@@ -212,18 +316,31 @@ def hero():
     st.markdown(
         """
         <div class="hero">
-            <p class="hero-title">Cyberdeck Retro</p>
-            <p class="hero-subtitle">
-                Um painel gratuito para revisar livros, comparar sinais de confiança
-                e navegar por reviews com estética arcade cyberpunk. Sem API paga,
-                sem tokens, sem scraping.
-            </p>
-            <div class="chip-row">
-                <span class="chip">Review Scanner</span>
-                <span class="chip">Radar de Compra</span>
-                <span class="chip">Comparador</span>
-                <span class="chip">Custo zero</span>
-                <span class="chip">Night City UI</span>
+            <div class="hero-content">
+                <p class="hero-title">Review Scanner Arcade</p>
+                <p class="hero-subtitle">
+                    Livros, reviews e sinais de confiança em um painel neon feito para leitura rápida.
+                </p>
+                <div class="chip-row">
+                    <span class="chip">Radar</span>
+                    <span class="chip">Comparador</span>
+                    <span class="chip">Score local</span>
+                    <span class="chip">Upload CSV</span>
+                    <span class="chip">Custo zero</span>
+                </div>
+            </div>
+            <div class="pixel-scene" aria-hidden="true">
+                <div class="pixel-sun"></div>
+                <div class="pixel-moon"></div>
+                <div class="skyline">
+                    <div class="tower t1"></div>
+                    <div class="tower t2"></div>
+                    <div class="tower t3"></div>
+                    <div class="tower t4"></div>
+                    <div class="tower t5"></div>
+                    <div class="tower t6"></div>
+                </div>
+                <div class="pixel-road"></div>
             </div>
         </div>
         """,
@@ -280,10 +397,6 @@ def callout(label: str, value: str):
         f"<div class='callout'><strong>{label}</strong><br>{value}</div>",
         unsafe_allow_html=True,
     )
-
-
-def section(title: str):
-    st.markdown(f"<p class='section-title'>{title}</p>", unsafe_allow_html=True)
 
 
 def style_chart(fig):

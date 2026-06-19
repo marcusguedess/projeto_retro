@@ -43,7 +43,23 @@ def add_review_signals(reviews: pd.DataFrame) -> pd.DataFrame:
         bins=[-1, 57, 78, 100],
         labels=["Revisar", "Boa", "Forte"],
     ).astype(str)
+    scored["score_reasons"] = scored.apply(review_reason_summary, axis=1)
     return scored
+
+
+def review_reason_summary(row: pd.Series) -> str:
+    reasons = []
+    if not bool(row["is_verified"]):
+        reasons.append("não verificada")
+    if bool(row["short_review"]):
+        reasons.append("texto curto")
+    if bool(row["generic_title"]):
+        reasons.append("título genérico")
+    if bool(row["unverified_extreme"]):
+        reasons.append("nota extrema sem verificação")
+    if bool(row["repeated_punctuation"]):
+        reasons.append("pontuação repetida")
+    return ", ".join(reasons) if reasons else "sem alertas relevantes"
 
 
 def build_book_summary(books: pd.DataFrame, reviews: pd.DataFrame) -> pd.DataFrame:
@@ -127,10 +143,44 @@ def filter_reviews(
     visible_books: pd.DataFrame,
     only_verified: bool,
     only_fragile: bool,
+    review_search: str = "",
 ) -> pd.DataFrame:
     filtered = reviews[reviews["book name"].isin(visible_books["book title"])].copy()
     if only_verified:
         filtered = filtered[filtered["is_verified"]]
     if only_fragile:
         filtered = filtered[filtered["suspicious_flag"]]
+    if review_search:
+        needle = review_search.strip()
+        if needle:
+            title_match = filtered["review title"].str.contains(
+                needle, case=False, na=False, regex=False
+            )
+            body_match = filtered["review description"].str.contains(
+                needle, case=False, na=False, regex=False
+            )
+            book_match = filtered["book name"].str.contains(
+                needle, case=False, na=False, regex=False
+            )
+            filtered = filtered[title_match | body_match | book_match]
     return filtered
+
+
+def data_quality_report(books: pd.DataFrame, reviews: pd.DataFrame) -> pd.DataFrame:
+    rows = [
+        {
+            "Área": "Livros",
+            "Linhas": len(books),
+            "Colunas": len(books.columns),
+            "Células vazias": int(books.isna().sum().sum()),
+            "Duplicatas": int(books.duplicated().sum()),
+        },
+        {
+            "Área": "Reviews",
+            "Linhas": len(reviews),
+            "Colunas": len(reviews.columns),
+            "Células vazias": int(reviews.isna().sum().sum()),
+            "Duplicatas": int(reviews.duplicated().sum()),
+        },
+    ]
+    return pd.DataFrame(rows)

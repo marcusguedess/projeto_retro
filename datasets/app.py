@@ -11,6 +11,7 @@ if str(CURRENT_DIR) not in sys.path:
 from cyberdeck.analysis import (
     add_review_signals,
     build_book_summary,
+    data_quality_report,
     filter_books,
     filter_reviews,
     radar_cards,
@@ -132,6 +133,11 @@ with st.sidebar:
 
     only_verified = st.checkbox("Apenas reviews verificadas", value=False)
     only_fragile = st.checkbox("Somente reviews para revisar", value=False)
+    review_search = st.text_input(
+        "Buscar nas reviews",
+        "",
+        help="Busca literal em título, texto da review e nome do livro.",
+    )
 
     st.markdown("---")
     st.markdown("### Fonte de dados")
@@ -158,6 +164,7 @@ filtered_reviews = filter_reviews(
     filtered_books,
     only_verified,
     only_fragile,
+    review_search,
 )
 summary = build_book_summary(filtered_books, filtered_reviews)
 
@@ -192,8 +199,8 @@ st.caption(
 )
 radar_panel(radar_cards(summary))
 
-tab_radar, tab_compare, tab_reviews, tab_data, tab_notes = st.tabs(
-    ["Radar", "Comparador", "Reviews", "Dados", "Guia"]
+tab_radar, tab_compare, tab_reviews, tab_data, tab_quality, tab_notes = st.tabs(
+    ["Radar", "Comparador", "Reviews", "Dados", "Qualidade", "Guia"]
 )
 
 with tab_radar:
@@ -307,6 +314,7 @@ with tab_reviews:
             "is_verified",
             "trust_score",
             "trust_label",
+            "score_reasons",
             "word_count",
             "date",
         ]
@@ -318,6 +326,7 @@ with tab_reviews:
             "is_verified": "Verificada",
             "trust_score": "Confiança",
             "trust_label": "Faixa",
+            "score_reasons": "Por que revisar?",
             "word_count": "Palavras",
             "date": "Data",
         }
@@ -357,6 +366,35 @@ with tab_data:
             mime="text/csv",
             width="stretch",
         )
+
+with tab_quality:
+    st.markdown("#### Sobre os dados")
+    source_col1, source_col2, source_col3 = st.columns(3)
+    with source_col1:
+        st.metric("Fonte de livros", books_source)
+    with source_col2:
+        st.metric("Fonte de reviews", reviews_source)
+    with source_col3:
+        st.metric("Busca ativa", "Sim" if review_search else "Não")
+
+    quality = data_quality_report(df_books_raw, df_reviews_raw)
+    st.dataframe(quality, width="stretch", hide_index=True)
+
+    st.markdown("#### Colunas carregadas")
+    col_books, col_reviews = st.columns(2)
+    with col_books:
+        st.caption("Livros")
+        st.write(", ".join(df_books_raw.columns))
+    with col_reviews:
+        st.caption("Reviews")
+        st.write(", ".join(df_reviews_raw.columns))
+
+    st.markdown("#### Privacidade")
+    st.write(
+        "Se você usar uma base real, evite publicar CSVs brutos. Reviews podem conter "
+        "nomes, relatos pessoais e conteúdo sujeito aos termos da fonte original. "
+        "O app foi desenhado para rodar com upload local ou samples anonimizados."
+    )
 
 with tab_notes:
     st.markdown("#### Como o score funciona")
