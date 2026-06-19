@@ -1,5 +1,12 @@
+import sys
+from pathlib import Path
+
 import pandas as pd
 import streamlit as st
+
+CURRENT_DIR = Path(__file__).resolve().parent
+if str(CURRENT_DIR) not in sys.path:
+    sys.path.insert(0, str(CURRENT_DIR))
 
 from cyberdeck.analysis import (
     add_review_signals,
@@ -30,7 +37,6 @@ from cyberdeck.ui import (
     pie_trust,
     radar_panel,
     scatter_books,
-    section,
 )
 
 
@@ -179,7 +185,11 @@ if filtered_books.empty:
 if filtered_reviews.empty:
     st.warning("Nenhuma review encontrada com os filtros atuais.")
 
-section("Radar de compra")
+st.divider()
+st.subheader("Radar de Compra")
+st.caption(
+    "Destaques calculados a partir de preço, nota, volume de reviews, verificação e score de confiança."
+)
 radar_panel(radar_cards(summary))
 
 tab_radar, tab_compare, tab_reviews, tab_data, tab_notes = st.tabs(

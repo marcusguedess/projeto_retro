@@ -1,7 +1,6 @@
 import pandas as pd
 import plotly.express as px
 import streamlit as st
-from html import escape
 
 
 CYBER_CSS = """
@@ -47,7 +46,7 @@ h2, h3 {
     color: #A7F3FF;
 }
 
-.hero, .callout, .radar-card, .metric-card {
+.hero, .callout, .metric-card {
     border-radius: 8px;
 }
 
@@ -123,18 +122,18 @@ h2, h3 {
     margin: 12px 0 18px;
 }
 
-.metric-card, .radar-card {
+.metric-card {
     border: 1px solid rgba(34, 211, 238, 0.26);
     background: rgba(7, 10, 24, 0.82);
     padding: 16px;
     box-shadow: inset 0 0 24px rgba(139, 92, 246, 0.08);
 }
 
-.metric-label, .radar-label, .section-title {
+.metric-label, .section-title {
     font-family: 'JetBrains Mono', monospace;
 }
 
-.metric-label, .radar-label {
+.metric-label {
     color: #98A6BA;
     font-size: 0.76rem;
     text-transform: uppercase;
@@ -145,19 +144,6 @@ h2, h3 {
     font-size: 1.85rem;
     color: #FFFFFF;
     font-weight: 800;
-}
-
-.radar-title {
-    margin-top: 9px;
-    color: #FFFFFF;
-    font-weight: 800;
-    line-height: 1.15;
-}
-
-.radar-meta {
-    color: #B7C5D9;
-    font-size: 0.86rem;
-    margin-top: 8px;
 }
 
 .callout {
@@ -272,28 +258,21 @@ def metric_cards(total_books, avg_book_rating, total_reviews, verified_pct):
 
 
 def radar_panel(cards: dict):
-    html = ["<div class='radar-grid'>"]
-    for label, row in cards.items():
-        if row is None:
-            title = "Sem dados"
-            meta = "Ajuste os filtros"
-        else:
-            title = escape(str(row["book title"]))
-            meta = escape(
-                f"Nota {row['rating']:.1f} | Confiança {row['trust_score']:.0f} | "
-                f"Reviews {int(row['reviews'])}"
-            )
-        html.append(
-            f"""
-            <div class="radar-card">
-                <div class="radar-label">{label}</div>
-                <div class="radar-title">{title}</div>
-                <div class="radar-meta">{meta}</div>
-            </div>
-            """
-        )
-    html.append("</div>")
-    st.markdown("".join(html), unsafe_allow_html=True)
+    columns = st.columns(4)
+    for column, (label, row) in zip(columns, cards.items()):
+        with column:
+            with st.container(border=True):
+                st.caption(label.upper())
+                if row is None:
+                    st.markdown("**Sem dados**")
+                    st.caption("Ajuste os filtros")
+                else:
+                    st.markdown(f"**{row['book title']}**")
+                    st.metric("Nota", f"{row['rating']:.1f}")
+                    st.caption(
+                        f"Confiança {row['trust_score']:.0f}/100 | "
+                        f"Reviews {int(row['reviews'])}"
+                    )
 
 
 def callout(label: str, value: str):
