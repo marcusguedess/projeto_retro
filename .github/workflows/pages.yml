@@ -68,7 +68,7 @@ jobs:
         run: test -f web/out/index.html && test -f web/out/.nojekyll
 
       - name: Configurar Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Enviar artefato
         uses: actions/upload-pages-artifact@v3
