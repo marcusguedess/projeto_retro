@@ -1,21 +1,42 @@
-# BookSignal Analytics
+# BookSignal
 
-BookSignal Analytics é um projeto de portfólio para análise de catálogo editorial. Ele combina metadados de livros, preço, rating e sinais de qualidade de reviews em um dashboard estático preparado para GitHub Pages.
+BookSignal é um projeto de portfólio para decisão editorial. Ele combina metadados de livros, preço, rating e sinais de confiança para indicar quais títulos devem ser promovidos, auditados ou mantidos em observação.
+
+O projeto não tenta coletar dados automaticamente de Amazon, Mercado Livre ou lojas editoriais. Essas fontes dependem de APIs oficiais, permissão de uso, exportações autorizadas ou contratos de dados. A proposta aqui é mostrar a etapa de análise depois da ingestão: o usuário pode testar a demo com dados de amostra ou importar um CSV local no navegador.
 
 O projeto tem duas camadas:
 
 - um pipeline Python que limpa CSVs e exporta um contrato JSON;
-- uma interface em Next.js que apresenta ranking, qualidade das reviews, benchmarks por categoria e checagens de qualidade da base.
+- uma interface em Next.js que apresenta recomendações acionáveis, ranking explicável, benchmarks por categoria e importação local de CSV.
 
 ## Interface
 
-O dashboard é organizado em cinco visões:
+A interface foi reformulada como uma mesa de decisão:
 
-- `Visão geral`: resumo executivo, cards de oportunidade e detalhe do livro selecionado.
-- `Ranking`: catálogo filtrado por intenção de decisão.
-- `Reviews`: evidências recentes do livro selecionado.
-- `Dados`: distribuições agregadas e qualidade da base.
-- `Metodologia`: interpretação do score, limites e requisitos de fonte.
+- `Promover`: títulos com boa combinação de preço, rating e confiança.
+- `Auditar`: títulos que exigem leitura manual de reviews ou validação da base.
+- `Observar`: títulos úteis, mas ainda sem prioridade clara.
+- `Importar CSV`: leitura local no navegador, sem envio para servidor.
+
+Colunas aceitas no CSV:
+
+```csv
+title,author,genre,price,rating,reviews,verifiedPct,qualityScore
+Livro Exemplo,Autora Exemplo,Fiction,19.90,4.6,128,82,78
+```
+
+Também são aceitos alguns nomes em português, como `titulo`, `autor`, `genero`, `preco`, `nota` e `avaliacoes`.
+
+## Glossário Rápido
+
+- `Scraping`: copiar dados automaticamente de páginas de um site. Pode quebrar com mudanças de layout, ser bloqueado por captcha/rate limit ou violar termos de uso.
+- `Crawler`: programa que navega por páginas para encontrar ou coletar informações.
+- `API`: acesso oficial que um serviço oferece para outros sistemas usarem seus dados.
+- `CSV`: planilha simples em texto, compatível com Excel, Google Sheets e sistemas internos.
+- `Score`: pontuação calculada para comparar itens. No BookSignal, combina nota, preço, reviews e confiança.
+- `Rating`: nota média dada por leitores, normalmente de 1 a 5 estrelas.
+- `Review`: avaliação escrita por leitor.
+- `Benchmark`: comparação com uma média de referência, como a média do gênero.
 
 As imagens abaixo foram capturadas a partir do build estático de produção.
 
@@ -28,9 +49,9 @@ Versão mobile:
 ## Perguntas Que O Projeto Responde
 
 - Quais livros são bons candidatos para promoção ou curadoria?
-- Quais livros têm boas notas, mas evidência fraca nas reviews?
+- Quais livros precisam de auditoria antes de entrar em campanha?
 - Quais gêneros mostram melhor relação entre preço, rating e qualidade das reviews?
-- A base analisada é completa o bastante para sustentar a leitura?
+- O que a ferramenta consegue concluir quando só existe uma base exportada pelo usuário?
 
 ## Estrutura
 
@@ -126,6 +147,8 @@ O workflow `.github/workflows/pages.yml` executa exportação dos dados, testes 
 ## Observações Sobre Dados
 
 O repositório inclui CSVs de amostra para demonstração. Bases brutas de terceiros não devem ser commitadas sem licença, permissão de uso e revisão de privacidade.
+
+Marketplaces e livrarias online costumam ter termos de uso, bloqueios técnicos e restrições de redistribuição. Por isso, o projeto evita scraping automático e trabalha com dados autorizados, dados públicos permitidos ou arquivos exportados pelo usuário.
 
 O score de qualidade das reviews é uma heurística local. Ele destaca evidências fracas, como texto curto, review não verificada e rating extremo, mas não deve ser interpretado como detecção de fraude.
 

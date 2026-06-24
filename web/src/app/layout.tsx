@@ -17,24 +17,24 @@ const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "BookSignal Analytics",
+  title: "BookSignal",
   description:
-    "Dashboard de inteligência editorial para catálogo, reviews e sinais de confiança.",
+    "Ferramenta de decisão editorial para priorizar, auditar e comparar livros a partir de CSVs ou bases autorizadas.",
   icons: {
     icon: `${basePath}/icon.svg`,
   },
   openGraph: {
     type: "website",
-    title: "BookSignal Analytics",
+    title: "BookSignal",
     description:
-      "Dashboard de inteligência editorial para catálogo, reviews e sinais de confiança.",
+      "Ferramenta de decisão editorial para priorizar, auditar e comparar livros a partir de CSVs ou bases autorizadas.",
     images: [`${basePath}/opengraph-image.svg`],
   },
   twitter: {
     card: "summary_large_image",
-    title: "BookSignal Analytics",
+    title: "BookSignal",
     description:
-      "Dashboard de inteligência editorial para catálogo, reviews e sinais de confiança.",
+      "Ferramenta de decisão editorial para priorizar, auditar e comparar livros a partir de CSVs ou bases autorizadas.",
     images: [`${basePath}/opengraph-image.svg`],
   },
 };
