@@ -28,14 +28,14 @@ export const metadata: Metadata = {
     title: "BookSignal Analytics",
     description:
       "Ferramenta de decisão editorial para priorizar, auditar e comparar livros a partir de CSVs ou bases autorizadas.",
-    images: [`${basePath}/opengraph-image.svg`],
+    images: ["/opengraph-image.svg"],
   },
   twitter: {
     card: "summary_large_image",
     title: "BookSignal Analytics",
     description:
       "Ferramenta de decisão editorial para priorizar, auditar e comparar livros a partir de CSVs ou bases autorizadas.",
-    images: [`${basePath}/opengraph-image.svg`],
+    images: ["/opengraph-image.svg"],
   },
 };
 

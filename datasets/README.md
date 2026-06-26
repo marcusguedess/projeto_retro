@@ -1,15 +1,15 @@
-# Dados locais
+# Dados De Amostra
 
-Os arquivos CSV brutos usados no desenvolvimento local podem ficar nesta pasta, mas nao devem ser publicados no GitHub por padrao.
+Os CSVs brutos usados no desenvolvimento podem ficar nesta pasta, mas não devem ser publicados no GitHub por padrão.
+
+O repositório inclui `sample_books.csv` e `sample_reviews.csv`, com conteúdo sintético e anonimizado, para que a demo possa ser executada sem acessar bases de terceiros.
 
 Arquivos esperados pelo app:
 
 - `Top-100 Trending Books.csv`
 - `customer reviews.csv`
 
-Motivo: a base de reviews pode conter nomes de revisores, textos longos com informacoes pessoais e conteudo sujeito a termos de uso da fonte original. Para publicar o projeto, mantenha os CSVs fora do repositorio ou substitua por uma amostra anonimizada.
-
-O repositorio inclui os arquivos `sample_books.csv` e `sample_reviews.csv` para que outras pessoas consigam clonar, gerar o JSON analitico e testar o dashboard sem acessar os dados brutos.
+Motivo: uma base de reviews pode conter nomes de revisores, textos com informações pessoais e conteúdo sujeito aos termos de uso da fonte original. Para publicar o projeto, mantenha os CSVs fora do repositório ou substitua-os por uma amostra anonimizada.
 
 ## Colunas esperadas
 

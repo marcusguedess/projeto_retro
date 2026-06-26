@@ -1,6 +1,6 @@
 # Arquitetura
 
-O BookSignal separa preparação de dados e apresentação visual.
+O BookSignal Analytics separa preparação de dados e apresentação visual. A arquitetura foi escolhida para demonstrar análise após a ingestão, sem depender de coleta automática de sites externos.
 
 ```text
 CSVs de amostra
@@ -28,7 +28,7 @@ O export contém:
 
 A interface fica em `web/` e usa Next.js App Router.
 
-O dashboard é estático por escolha de arquitetura. Isso mantém o projeto barato de hospedar, simples de revisar e seguro para GitHub Pages, já que nenhuma chave de API ou serviço privado é necessário em runtime.
+O dashboard é estático por escolha de arquitetura. Isso mantém a demo simples de hospedar e revisar no GitHub Pages, sem chaves de API ou serviços privados em runtime. A importação de CSV ocorre localmente no navegador.
 
 ## CI E Publicação
 
@@ -46,4 +46,4 @@ O workflow do GitHub Actions executa a mesma sequência esperada localmente:
 
 ## Por Que Export Estático
 
-GitHub Pages não executa backend nem protege secrets. O export estático é o limite correto para a versão pública do projeto. Uma implantação privada poderia adicionar banco, ingestão sob demanda e conectores externos, mas isso fica fora do escopo da versão de portfólio.
+GitHub Pages não executa backend nem é adequado para armazenar segredos. O export estático atende ao escopo público do projeto: demonstrar a análise de uma base já disponível. Banco de dados, ingestão sob demanda e conectores externos não fazem parte desta versão.

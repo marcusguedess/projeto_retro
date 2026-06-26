@@ -1,6 +1,6 @@
 # Metodologia
 
-O dashboard foi desenhado para análise comparativa. Os scores ajudam a priorizar livros para curadoria, promoção ou leitura manual mais cuidadosa.
+O dashboard foi desenhado para análise comparativa de uma base já disponível. Os scores ajudam a priorizar livros para curadoria, promoção ou revisão manual.
 
 ## Ranking Dos Livros
 
@@ -16,7 +16,7 @@ A interface também oferece modos de decisão para promoção, auditoria, busca 
 
 ## Qualidade Das Reviews
 
-A qualidade da review é uma heurística local. O score reduz confiança quando encontra sinais como:
+A qualidade da review é uma heurística local. O score reduz a confiança quando encontra sinais como:
 
 - review não verificada;
 - texto muito curto;
@@ -24,7 +24,7 @@ A qualidade da review é uma heurística local. O score reduz confiança quando 
 - nota extrema com pouco contexto;
 - pontuação repetida.
 
-O score não classifica uma review como falsa. Ele apenas indica registros que merecem leitura manual.
+O score não classifica uma review como falsa nem detecta fraude. Ele apenas indica registros que merecem leitura manual.
 
 ## Normalização De Gêneros
 
@@ -47,6 +47,6 @@ Essas checagens são simples de propósito. O objetivo é deixar claro se a base
 
 ## Limitações
 
-Os dados de amostra demonstram o fluxo do produto, mas não representam um feed de mercado em tempo real.
+Os dados de amostra demonstram o fluxo do produto; não representam dados de mercado em tempo real.
 
-Em uso operacional, preço, rating e reviews devem carregar origem, data de coleta, permissão de uso e política de atualização. A versão pública no GitHub Pages não armazena secrets, não chama APIs pagas e não executa ingestão server-side.
+Em uso operacional, preço, rating e reviews devem carregar origem, data de coleta, permissão de uso e política de atualização. A versão pública no GitHub Pages não armazena segredos, não chama APIs pagas e não executa ingestão no servidor. A análise começa após a importação de uma base autorizada ou de amostra.

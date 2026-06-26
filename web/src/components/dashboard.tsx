@@ -335,7 +335,7 @@ export function Dashboard({ data: initialData }: { data: DashboardData }) {
       <section className="hero">
         <div className="hero__content">
           <p className="eyebrow">Produto de dados para catálogo editorial</p>
-          <h1>Priorize livros com uma recomendação explicável, não com achismo.</h1>
+          <h1>Priorize livros com critérios claros e recomendações explicáveis.</h1>
           <p className="hero__copy">
             BookSignal Analytics transforma uma planilha de catálogo em três saídas simples:
             promover, auditar ou observar. Ele não faz scraping; trabalha com dados autorizados,
@@ -524,7 +524,7 @@ export function Dashboard({ data: initialData }: { data: DashboardData }) {
         </article>
         <article className="panel method-card">
           <p className="section-kicker">Limite do produto</p>
-          <h2>Sem crawler universal</h2>
+          <h2>Coleta fora do escopo da demo</h2>
           <p>
             Crawler e um robo que visita paginas. Scraping e quando esse robo copia informacoes do site.
             Marketplaces podem bloquear isso ou proibir nos termos de uso, por isso a demo evita essa dependencia.

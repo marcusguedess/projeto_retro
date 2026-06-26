@@ -41,12 +41,12 @@
   <rect x="88" y="84" width="132" height="28" rx="14" fill="#0E1A29" stroke="#7DD3FC" stroke-opacity="0.3"/>
   <text x="110" y="103" fill="#7DD3FC" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700" letter-spacing="2">BOOKSIGNAL</text>
   <text x="86" y="238" fill="#F8FAFC" font-family="Inter, Arial, sans-serif" font-size="68" font-weight="800">
-    <tspan x="86" dy="0">Inteligência visual</tspan>
-    <tspan x="86" dy="74">para catálogo editorial</tspan>
-    <tspan x="86" dy="74">e reviews confiáveis.</tspan>
+    <tspan x="86" dy="0">Decisão editorial</tspan>
+    <tspan x="86" dy="74">a partir de um</tspan>
+    <tspan x="86" dy="74">catálogo disponível.</tspan>
   </text>
   <text x="88" y="472" fill="#C8D2E2" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="500">
-    Pipeline Python, UI Next.js e leitura de mercado orientada por evidência.
+    Pipeline Python, UI Next.js e recomendações explicáveis.
   </text>
   <g transform="translate(786 160)">
     <rect x="0" y="0" width="300" height="300" rx="28" fill="#0B1520" stroke="#FFFFFF" stroke-opacity="0.14"/>

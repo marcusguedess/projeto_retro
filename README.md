@@ -1,22 +1,26 @@
 # BookSignal Analytics
 
-BookSignal Analytics é um projeto de portfólio para decisão editorial. Ele combina metadados de livros, preço, rating e sinais de confiança para indicar quais títulos devem ser promovidos, auditados ou mantidos em observação.
+Dashboard de decisão editorial para explorar catálogos de livros depois da ingestão dos dados. O projeto combina metadados, preço, rating e sinais de qualidade para ajudar a priorizar títulos para promoção, revisão ou observação.
 
-O projeto não tenta coletar dados automaticamente de Amazon, Mercado Livre ou lojas editoriais. Essas fontes dependem de APIs oficiais, permissão de uso, exportações autorizadas ou contratos de dados. A proposta aqui é mostrar a etapa de análise depois da ingestão: o usuário pode testar a demo com dados de amostra ou importar um CSV local no navegador.
+[Demo publicada](https://marcusguedess.github.io/booksignal-analytics/)
+
+BookSignal Analytics foi criado como um case de produto de dados: a coleta e a autorização das fontes acontecem antes da análise. A demo usa dados de amostra e também aceita um CSV local, processado no próprio navegador.
 
 O projeto tem duas camadas:
 
 - um pipeline Python que limpa CSVs e exporta um contrato JSON;
 - uma interface em Next.js que apresenta recomendações acionáveis, ranking explicável, benchmarks por categoria e importação local de CSV.
 
-## Interface
+## O Que A Demo Faz
 
-A interface foi reformulada como uma mesa de decisão:
+- Organiza livros em recomendações de promover, auditar ou observar.
+- Permite buscar, filtrar e comparar o catálogo por categoria.
+- Explica os componentes usados em cada recomendação.
+- Importa CSV localmente, sem enviar arquivos para um servidor.
 
-- `Promover`: títulos com boa combinação de preço, rating e confiança.
-- `Auditar`: títulos que exigem leitura manual de reviews ou validação da base.
-- `Observar`: títulos úteis, mas ainda sem prioridade clara.
-- `Importar CSV`: leitura local no navegador, sem envio para servidor.
+## Dados De Entrada
+
+O projeto não coleta dados automaticamente de Amazon, Mercado Livre ou lojas editoriais. Essas fontes exigem API oficial, permissão de uso, exportações autorizadas ou contratos de dados. O foco da demo é a etapa de análise após a ingestão.
 
 Colunas aceitas no CSV:
 
@@ -27,24 +31,20 @@ Livro Exemplo,Autora Exemplo,Fiction,19.90,4.6,128,82,78
 
 Também são aceitos alguns nomes em português, como `titulo`, `autor`, `genero`, `preco`, `nota` e `avaliacoes`.
 
-## Glossário Rápido
+## Decisões De Produto
 
-- `Scraping`: copiar dados automaticamente de páginas de um site. Pode quebrar com mudanças de layout, ser bloqueado por captcha/rate limit ou violar termos de uso.
-- `Crawler`: programa que navega por páginas para encontrar ou coletar informações.
-- `API`: acesso oficial que um serviço oferece para outros sistemas usarem seus dados.
-- `CSV`: planilha simples em texto, compatível com Excel, Google Sheets e sistemas internos.
-- `Score`: pontuação calculada para comparar itens. No BookSignal Analytics, combina nota, preço, reviews e confiança.
-- `Rating`: nota média dada por leitores, normalmente de 1 a 5 estrelas.
-- `Review`: avaliação escrita por leitor.
-- `Benchmark`: comparação com uma média de referência, como a média do gênero.
+- **CSV local:** mantém a demonstração simples de executar, sem credenciais, backend ou retenção de arquivos.
+- **Recomendações explicáveis:** cada indicação mostra os sinais considerados, em vez de apresentar uma decisão como caixa-preta.
+- **Scores heurísticos:** as pontuações servem para ordenar e orientar uma revisão humana; não medem desempenho de mercado nem detectam fraude.
+- **Decisão antes da coleta:** o projeto prioriza leitura e priorização de um catálogo já disponível, não automação de coleta em sites de terceiros.
 
-As imagens abaixo foram capturadas a partir do build estático de produção.
+## Termos Usados
 
-![Dashboard desktop do BookSignal](assets/screenshots/dashboard-desktop.png)
-
-Versão mobile:
-
-![Dashboard mobile do BookSignal](assets/screenshots/dashboard-mobile.png)
+- **CSV:** arquivo de planilha em texto, compatível com Excel, Google Sheets e sistemas internos.
+- **Score:** pontuação calculada para comparar itens dentro da mesma base.
+- **Rating:** nota média dada por leitores, normalmente de 1 a 5 estrelas.
+- **Review:** avaliação escrita por leitor.
+- **Benchmark:** comparação com uma média de referência, como a média de uma categoria.
 
 ## Perguntas Que O Projeto Responde
 
@@ -85,7 +85,13 @@ Versão mobile:
 - Export estático para GitHub Pages.
 - GitHub Actions para testes, lint, typecheck e publicação.
 
+## Status
+
+Em evolução como projeto de portfólio. A versão pública é uma demo estática com dados de amostra e importação local de CSV; ela não fornece dados em tempo real nem integrações com marketplaces.
+
 ## Como Rodar
+
+Pré-requisitos: Python 3.13+ e Node.js 24+.
 
 Instale as dependências Python:
 
@@ -148,9 +154,9 @@ O workflow `.github/workflows/pages.yml` executa exportação dos dados, testes 
 
 O repositório inclui CSVs de amostra para demonstração. Bases brutas de terceiros não devem ser commitadas sem licença, permissão de uso e revisão de privacidade.
 
-Marketplaces e livrarias online costumam ter termos de uso, bloqueios técnicos e restrições de redistribuição. Por isso, o projeto evita scraping automático e trabalha com dados autorizados, dados públicos permitidos ou arquivos exportados pelo usuário.
+Marketplaces e livrarias online costumam ter termos de uso, limites técnicos e restrições de redistribuição. Por isso, o projeto não depende de scraping automático e trabalha com dados autorizados, dados públicos permitidos ou arquivos exportados pelo usuário.
 
-O score de qualidade das reviews é uma heurística local. Ele destaca evidências fracas, como texto curto, review não verificada e rating extremo, mas não deve ser interpretado como detecção de fraude.
+O score de qualidade das reviews é uma heurística local. Ele destaca sinais que merecem revisão, como texto curto, review não verificada e rating extremo; não representa detecção de fraude.
 
 ## Documentação
 
