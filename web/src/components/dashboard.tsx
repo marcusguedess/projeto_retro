@@ -6,17 +6,18 @@ import type { Book, DashboardData, DistributionRow, GenreRow } from "@/data/cont
 
 type DecisionMode = "promote" | "audit" | "value";
 type SortKey = "decision" | "valueScore" | "qualityScore" | "reviews" | "rating";
+type ImportStatusTone = "demo" | "success" | "error";
 
 const modeLabels: Record<DecisionMode, string> = {
   promote: "Promover",
   audit: "Auditar",
-  value: "Barganhas",
+  value: "Custo-benefício",
 };
 
 const modeDescriptions: Record<DecisionMode, string> = {
-  promote: "Destaque títulos com sinal consistente.",
+  promote: "Priorize títulos com evidências consistentes.",
   audit: "Encontre sinais que pedem revisão humana.",
-  value: "Compare preço, nota e evidências.",
+  value: "Encontre uma boa relação entre preço e sinal editorial.",
 };
 
 const decisionModes: DecisionMode[] = ["promote", "audit", "value"];
@@ -36,6 +37,14 @@ function formatNumber(value: number, digits = 0) {
   }).format(value);
 }
 
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
 function modeScore(book: Book, mode: DecisionMode) {
   if (mode === "audit") {
     return book.reviewsToAudit * 35 + book.ratingStd * 25 + (100 - book.qualityScore);
@@ -51,20 +60,20 @@ function recommendation(book: Book) {
     return {
       label: "Promover",
       tone: "strong",
-      reason: "Bom equilibrio entre rating, preco e confianca das evidencias.",
+      reason: "Boa combinação entre nota, preço e confiança das evidências.",
     };
   }
   if (book.reviewsToAudit > 0 || book.qualityScore < 62 || book.ratingStd >= 1) {
     return {
       label: "Auditar",
       tone: "warn",
-      reason: "Antes de destacar, leia as reviews com baixa confianca ou alta dispersao.",
+      reason: "Antes de destacar, revise avaliações com baixa confiança ou alta dispersão.",
     };
   }
   return {
     label: "Observar",
     tone: "neutral",
-    reason: "Tem sinais uteis, mas ainda nao e uma prioridade clara.",
+    reason: "Tem sinais úteis, mas ainda não é uma prioridade clara.",
   };
 }
 
@@ -72,11 +81,11 @@ function decisionCopy(book: Book, mode: DecisionMode) {
   const rec = recommendation(book);
   if (mode === "audit") {
     return rec.label === "Auditar"
-      ? "Prioridade de auditoria: a amostra pede leitura manual antes de qualquer acao comercial."
-      : "Baixo risco aparente na amostra atual, mas a decisao ainda depende da origem dos dados.";
+      ? "Prioridade de auditoria: a amostra pede leitura manual antes de qualquer ação comercial."
+      : "Baixo risco aparente na amostra atual, mas a decisão ainda depende da origem dos dados.";
   }
   if (mode === "value") {
-    return "Leitura de barganha: prioriza preco competitivo sem ignorar rating e confianca.";
+    return "Leitura de custo-benefício: prioriza preço competitivo sem ignorar nota e confiança.";
   }
   return rec.reason;
 }
@@ -85,7 +94,15 @@ function maxValue(rows: DistributionRow[], key: keyof DistributionRow = "count")
   return Math.max(...rows.map((row) => Number(row[key]) || 0), 1);
 }
 
+function detectCsvSeparator(text: string) {
+  const firstLine = text.split(/\r?\n/, 1)[0] ?? "";
+  const commas = (firstLine.match(/,/g) ?? []).length;
+  const semicolons = (firstLine.match(/;/g) ?? []).length;
+  return semicolons > commas ? ";" : ",";
+}
+
 function parseCsv(text: string) {
+  const separator = detectCsvSeparator(text);
   const rows: string[][] = [];
   let row: string[] = [];
   let cell = "";
@@ -100,7 +117,7 @@ function parseCsv(text: string) {
       index += 1;
     } else if (char === '"') {
       quoted = !quoted;
-    } else if (char === "," && !quoted) {
+    } else if (char === separator && !quoted) {
       row.push(cell.trim());
       cell = "";
     } else if ((char === "\n" || char === "\r") && !quoted) {
@@ -121,12 +138,35 @@ function parseCsv(text: string) {
 
 function numberFrom(value: string | undefined, fallback = 0) {
   if (!value) return fallback;
-  const parsed = Number(value.replace(",", ".").replace(/[^\d.-]/g, ""));
+  const source = value.trim().replace(/[^\d,.-]/g, "");
+  const comma = source.lastIndexOf(",");
+  const dot = source.lastIndexOf(".");
+  const normalized = comma > dot
+    ? source.replace(/\./g, "").replace(",", ".")
+    : source.replace(/,/g, "");
+  const parsed = Number(normalized);
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
 function normalizeHeader(value: string) {
-  return value.trim().toLowerCase().replace(/\s+/g, "_");
+  return value.replace(/^\uFEFF/, "").trim().toLowerCase().replace(/\s+/g, "_");
+}
+
+function decisionReasons(book: Book, mode: DecisionMode) {
+  const reasons: string[] = [];
+  if (book.rating >= 4.5) reasons.push("Boa nota média na base atual");
+  if (book.scoreBreakdown.price >= 48) reasons.push("Preço competitivo para a categoria");
+  if (book.qualityScore >= 75) reasons.push("Confiança suficiente nas evidências");
+  if (book.reviews >= 5) reasons.push("Volume de avaliações ajuda a sustentar a leitura");
+  if (book.reviewsToAudit > 0) reasons.push("Há sinais que pedem auditoria antes de promover");
+  if (book.ratingStd >= 1) reasons.push("As notas têm dispersão relevante");
+  if (mode === "value" && !reasons.some((reason) => reason.includes("Preço"))) {
+    reasons.unshift("O preço é o principal sinal deste recorte");
+  }
+  if (mode === "audit" && book.reviewsToAudit === 0) {
+    reasons.unshift("Poucos sinais de risco na amostra atual");
+  }
+  return reasons.slice(0, 4).length ? reasons.slice(0, 4) : ["A base ainda tem poucos sinais para uma decisão mais forte"];
 }
 
 function percentilePrice(price: number, maxPrice: number) {
@@ -136,7 +176,7 @@ function percentilePrice(price: number, maxPrice: number) {
 
 function buildImportedData(source: DashboardData, text: string): DashboardData {
   const rows = parseCsv(text);
-  if (rows.length < 2) throw new Error("O CSV precisa ter cabecalho e pelo menos um livro.");
+  if (rows.length < 2) throw new Error("O CSV precisa ter cabeçalho e pelo menos um livro.");
 
   const headers = rows[0].map(normalizeHeader);
   const records = rows.slice(1).map((row) =>
@@ -146,7 +186,7 @@ function buildImportedData(source: DashboardData, text: string): DashboardData {
 
   const books: Book[] = records.map((row, index) => {
     const title = row.title || row.titulo || row.book || row.livro || `Livro ${index + 1}`;
-    const author = row.author || row.autor || "Autor nao informado";
+    const author = row.author || row.autor || "Autor não informado";
     const genre = row.genre || row.genero || row.category || row.categoria || "Sem categoria";
     const rawGenre = row.rawgenre || row.genero_original || genre;
     const price = numberFrom(row.price || row.preco, 0);
@@ -212,8 +252,8 @@ function buildImportedData(source: DashboardData, text: string): DashboardData {
     generatedAt: new Date().toISOString(),
     sources: {
       books: "CSV importado no navegador",
-      reviews: "Nao importadas",
-      reviewPeriod: "Sessao local",
+      reviews: "Não importadas",
+      reviewPeriod: "Sessão local",
       dataAge: "agora",
     },
     metrics: {
@@ -238,10 +278,10 @@ function buildImportedData(source: DashboardData, text: string): DashboardData {
       rawGenreLabels: genres.length,
       tables: [
         {
-          "Area": "CSV importado",
+          "Área": "CSV importado",
           "Linhas": books.length,
           "Colunas": headers.length,
-          "Celulas vazias": records.reduce(
+          "Células vazias": records.reduce(
             (sum, row) => sum + Object.values(row).filter((value) => !value).length,
             0,
           ),
@@ -252,7 +292,7 @@ function buildImportedData(source: DashboardData, text: string): DashboardData {
     opportunityCards: {
       "Promover primeiro": [...books].sort((a, b) => b.valueScore - a.valueScore)[0]?.title ?? null,
       "Auditar antes": [...books].sort((a, b) => modeScore(b, "audit") - modeScore(a, "audit"))[0]?.title ?? null,
-      "Melhor barganha": [...books].sort((a, b) => modeScore(b, "value") - modeScore(a, "value"))[0]?.title ?? null,
+      "Melhor custo-benefício": [...books].sort((a, b) => modeScore(b, "value") - modeScore(a, "value"))[0]?.title ?? null,
     },
     books,
     genres,
@@ -273,7 +313,10 @@ export function Dashboard({ data: initialData }: { data: DashboardData }) {
   const [sortKey, setSortKey] = useState<SortKey>("decision");
   const [decisionMode, setDecisionMode] = useState<DecisionMode>("promote");
   const [selectedTitle, setSelectedTitle] = useState(initialData.books[0]?.title ?? "");
-  const [importStatus, setImportStatus] = useState("Demo carregada com dados de amostra.");
+  const [importStatus, setImportStatus] = useState({
+    tone: "demo" as ImportStatusTone,
+    message: "Demo carregada com dados de amostra. Importe um CSV quando quiser comparar outra base.",
+  });
 
   const genres = useMemo(
     () => ["Todos", ...Array.from(new Set(data.books.map((book) => book.genre))).sort()],
@@ -324,7 +367,10 @@ export function Dashboard({ data: initialData }: { data: DashboardData }) {
     setGenre("Todos");
     setQuery("");
     setSelectedTitle(imported.books[0]?.title ?? "");
-    setImportStatus(`${imported.books.length} livros importados. Nada foi enviado para servidor.`);
+    setImportStatus({
+      tone: "success",
+      message: `CSV importado localmente: ${imported.books.length} títulos analisados. Nada foi enviado para o servidor.`,
+    });
   }
 
   function handleFile(event: ChangeEvent<HTMLInputElement>) {
@@ -333,7 +379,10 @@ export function Dashboard({ data: initialData }: { data: DashboardData }) {
     file
       .text()
       .then(importText)
-      .catch(() => setImportStatus("Nao consegui ler o arquivo. Confira se ele esta em CSV UTF-8."));
+      .catch(() => setImportStatus({
+        tone: "error",
+        message: "Não consegui ler o arquivo. Confira se ele está em CSV UTF-8.",
+      }));
   }
 
   const template =
@@ -358,29 +407,31 @@ export function Dashboard({ data: initialData }: { data: DashboardData }) {
           <p className="eyebrow">Produto de dados para catálogo editorial</p>
           <h1>Da planilha para uma decisão editorial clara.</h1>
           <p className="hero__copy">
-            Compare sinais de preço, avaliação e qualidade para decidir onde promover, onde revisar
-            e o que manter em observação.
+            Importe um catálogo ou use a amostra para comparar nota, preço, confiança e volume de
+            avaliações antes de decidir onde promover, auditar ou observar.
           </p>
-          <div className="hero__actions">
+          <div className="import-box">
             <label className="file-button">
-              Importar CSV
-              <input accept=".csv,text/csv" type="file" onChange={handleFile} />
+              <span>Importar meu CSV</span>
+              <small>Processamento local, sem envio de arquivo</small>
+              <input className="visually-hidden" accept=".csv,text/csv" type="file" onChange={handleFile} />
             </label>
             <a
               className="ghost-button"
               download="booksignal-template.csv"
               href={`data:text/csv;charset=utf-8,${encodeURIComponent(template)}`}
             >
-              Baixar template
+              Baixar CSV de exemplo
             </a>
+            <span className="import-fields">Campos: title, author, genre, price, rating, reviews, verifiedPct, qualityScore</span>
           </div>
-          <p className="import-status" aria-live="polite">{importStatus}</p>
+          <p className={`import-status import-status--${importStatus.tone}`} aria-live="polite">{importStatus.message}</p>
         </div>
-        <div className="decision-board" aria-label="Resumo de decisoes">
+        <div className="decision-board" aria-label="Resumo de decisões">
           <DecisionTile label="Promover" value={promoteCount} tone="strong" />
           <DecisionTile label="Auditar" value={auditCount} tone="warn" />
-          <DecisionTile label="Livros" value={data.metrics.books} tone="neutral" />
-          <DecisionTile label="Reviews" value={data.metrics.reviews} tone="neutral" />
+          <DecisionTile label="Observar" value={observeCount} tone="neutral" />
+          <DecisionTile label="Total na base" value={data.metrics.books} tone="base" />
         </div>
       </section>
 
@@ -404,6 +455,24 @@ export function Dashboard({ data: initialData }: { data: DashboardData }) {
             marketplaces ou lojas sem API, permissão ou exportação autorizada.
           </p>
         </details>
+      </section>
+
+      <section className="executive-summary" aria-labelledby="executive-summary-title">
+        <div className="executive-summary__header">
+          <div>
+            <p className="section-kicker">Resumo da base</p>
+            <h2 id="executive-summary-title">O que pede atenção agora</h2>
+          </div>
+          <span>{data.metrics.reviews} avaliações na base</span>
+        </div>
+        <div className="summary-grid">
+          <SummaryMetric label="Títulos" value={data.metrics.books.toString()} />
+          <SummaryMetric label="Promover" value={promoteCount.toString()} tone="strong" />
+          <SummaryMetric label="Auditar" value={auditCount.toString()} tone="warn" />
+          <SummaryMetric label="Observar" value={observeCount.toString()} tone="neutral" />
+          <SummaryMetric label="Melhor sinal" value={data.summary.topGenre} />
+          <SummaryMetric label="Confiança média" value={`${formatNumber(data.metrics.qualityScore)} / 100`} />
+        </div>
       </section>
 
       <section className="workspace" aria-labelledby="workspace-title">
@@ -432,12 +501,12 @@ export function Dashboard({ data: initialData }: { data: DashboardData }) {
 
         <div className="filters">
           <input
-            aria-label="Buscar livro, autor ou genero"
+            aria-label="Buscar livro, autor ou gênero"
             placeholder="Buscar título, autor ou categoria"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
           />
-          <select aria-label="Filtrar genero" value={genre} onChange={(event) => setGenre(event.target.value)}>
+          <select aria-label="Filtrar gênero" value={genre} onChange={(event) => setGenre(event.target.value)}>
             {genres.map((item) => (
               <option key={item}>{item}</option>
             ))}
@@ -484,6 +553,12 @@ export function Dashboard({ data: initialData }: { data: DashboardData }) {
                     <span className="book-main">
                       <strong>{book.title}</strong>
                       <small>{book.author.trim()} · {book.genre}</small>
+                      <span className="book-signals" aria-label="Sinais do título">
+                        <span>{formatNumber(book.rating, 1)} rating</span>
+                        <span>{formatCurrency(book.price)}</span>
+                        <span>{formatNumber(book.qualityScore)} confiança</span>
+                        <span>{book.reviews} reviews</span>
+                      </span>
                     </span>
                     <span className={`status status--${rec.tone}`}>{rec.label}</span>
                     <span className="book-score">
@@ -504,21 +579,26 @@ export function Dashboard({ data: initialData }: { data: DashboardData }) {
         </div>
 
         <aside className="panel insight">
-          <p className="section-kicker">Leitura recomendada</p>
+          <p className="section-kicker">Análise do título</p>
           <h2>{selectedBook?.title}</h2>
           <p>
             {selectedBook?.author.trim()} · {selectedBook?.rawGenre}
           </p>
           {selectedBook ? <span className={`status status--${recommendation(selectedBook).tone}`}>{recommendation(selectedBook).label}</span> : null}
           <div className="insight__stats">
-            <Stat label="Preco" value={`$${selectedBook?.price.toFixed(2)}`} />
+            <Stat label="Preço" value={selectedBook ? formatCurrency(selectedBook.price) : "$0.00"} />
             <Stat label="Rating medio" value={selectedBook?.rating.toFixed(1) ?? "0"} />
             <Stat label="Reviews" value={selectedBook?.reviews.toString() ?? "0"} />
-            <Stat label="Confianca" value={`${selectedBook?.qualityScore.toFixed(0) ?? "0"}/100`} />
+            <Stat label="Confiança" value={`${selectedBook?.qualityScore.toFixed(0) ?? "0"}/100`} />
           </div>
           <div className="decision">
-            <strong>Por que essa decisao?</strong>
+            <strong>Leitura da decisão</strong>
             <p>{selectedBook ? decisionCopy(selectedBook, decisionMode) : "Selecione um livro para detalhar."}</p>
+            {selectedBook ? (
+              <ul className="decision-reasons">
+                {decisionReasons(selectedBook, decisionMode).map((reason) => <li key={reason}>{reason}</li>)}
+              </ul>
+            ) : null}
           </div>
           {selectedGenre ? (
             <div className="decision decision--secondary">
@@ -532,7 +612,7 @@ export function Dashboard({ data: initialData }: { data: DashboardData }) {
           {selectedBook ? (
             <div className="score-breakdown" aria-label="Decomposicao do score">
               <ScorePart label="Rating" value={selectedBook.scoreBreakdown.rating} />
-              <ScorePart label="Preco" value={selectedBook.scoreBreakdown.price} />
+              <ScorePart label="Preço" value={selectedBook.scoreBreakdown.price} />
               <ScorePart label="Reviews" value={selectedBook.scoreBreakdown.reviewQuality} />
               <ScorePart label="Evidencia" value={selectedBook.scoreBreakdown.evidence} />
             </div>
@@ -541,20 +621,27 @@ export function Dashboard({ data: initialData }: { data: DashboardData }) {
       </section>
 
       <section className="analytics-grid">
-        <ChartPanel title="Categorias com melhor sinal">
-          {topGenres.map((row) => (
-            <Bar key={row.genre_group} label={row.genre_group} value={row.avg_value} max={genreMax} suffix="score" />
-          ))}
-        </ChartPanel>
-        <ChartPanel title="Distribuicao de ratings">
-          {data.ratingDistribution.map((row) => (
-            <Bar key={row.rating} label={`${row.rating} estrelas`} value={row.count} max={ratingMax} suffix="registros" />
-          ))}
-        </ChartPanel>
-        <ChartPanel title="Saída da decisão">
-          {decisionDistribution.map((row) => (
-            <Bar key={row.label} label={row.label} value={row.count} max={decisionMax} suffix="livros" />
-          ))}
+          <ChartPanel title="Categorias com melhor sinal">
+            {topGenres.map((row) => (
+              <Bar key={row.genre_group} label={row.genre_group} value={row.avg_value} max={genreMax} suffix="score" tone="strong" />
+            ))}
+          </ChartPanel>
+          <ChartPanel title="Distribuição de ratings">
+            {data.ratingDistribution.map((row) => (
+              <Bar key={row.rating} label={`${row.rating} estrelas`} value={row.count} max={ratingMax} suffix="registros" tone="warm" />
+            ))}
+          </ChartPanel>
+          <ChartPanel title="Distribuição das decisões">
+            {decisionDistribution.map((row) => (
+              <Bar
+                key={row.label}
+                label={row.label}
+                value={row.count}
+                max={decisionMax}
+                suffix="títulos"
+                tone={row.label === "Promover" ? "strong" : row.label === "Auditar" ? "warn" : "neutral"}
+              />
+            ))}
         </ChartPanel>
       </section>
 
@@ -573,7 +660,7 @@ export function Dashboard({ data: initialData }: { data: DashboardData }) {
         <section className="panel">
           <div className="panel__header">
             <div>
-              <p className="section-kicker">Evidencias</p>
+              <p className="section-kicker">Evidências</p>
               <h2>Reviews recentes do livro selecionado</h2>
             </div>
             <span>{selectedReviews.length} registros</span>
@@ -589,7 +676,7 @@ export function Dashboard({ data: initialData }: { data: DashboardData }) {
                 <footer>
                   <span>{review.rating} estrelas</span>
                   <span>{review.qualityScore}/100</span>
-                  <span>{review.verified ? "verificada" : "nao verificada"}</span>
+                  <span>{review.verified ? "verificada" : "não verificada"}</span>
                 </footer>
               </article>
             ))}
@@ -603,6 +690,15 @@ export function Dashboard({ data: initialData }: { data: DashboardData }) {
 function DecisionTile({ label, value, tone }: { label: string; value: number; tone: string }) {
   return (
     <article className={`decision-tile decision-tile--${tone}`}>
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </article>
+  );
+}
+
+function SummaryMetric({ label, value, tone = "base" }: { label: string; value: string; tone?: string }) {
+  return (
+    <article className={`summary-metric summary-metric--${tone}`}>
       <span>{label}</span>
       <strong>{value}</strong>
     </article>
@@ -641,7 +737,19 @@ function ChartPanel({ title, children }: { title: string; children: ReactNode })
   );
 }
 
-function Bar({ label, value, max, suffix }: { label: string; value: number; max: number; suffix: string }) {
+function Bar({
+  label,
+  value,
+  max,
+  suffix,
+  tone = "strong",
+}: {
+  label: string;
+  value: number;
+  max: number;
+  suffix: string;
+  tone?: "strong" | "warn" | "neutral" | "warm";
+}) {
   const width = `${Math.max(6, (value / max) * 100)}%`;
   return (
     <div className="bar-row">
@@ -652,7 +760,7 @@ function Bar({ label, value, max, suffix }: { label: string; value: number; max:
         </strong>
       </div>
       <div className="bar-track">
-        <span style={{ width }} />
+        <span className={`bar--${tone}`} style={{ width }} />
       </div>
     </div>
   );
